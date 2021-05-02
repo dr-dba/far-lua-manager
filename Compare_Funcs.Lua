@@ -2,6 +2,19 @@
 ..
 */
 
+local str_upper = utf8.Utf8_upper	or utf8.upper
+local str_gmatch= utf8.Utf8_gmatch	or utf8.gmatch
+local str_len	= utf8.Utf8_len		or utf8.len
+local str_cfind = utf8.cfind
+local str_format= utf8.format
+local math_max	= math.max
+local tbl_concat= table.concat
+local far_LIsUpper = far.LIsUpper
+
+/*
+..
+*/
+
 	local Area_Current_upper = str_upper(Area.Current)
 	--
 	-- сравнение 2 макросов по: "COMMON"?, текущая?, по областям, по клавишам, по маскам файлов, по описаниям
@@ -130,7 +143,7 @@
 		do	c_upper = str_upper(c)
 			a1, b1 = "", ""
 			if	c_upper == "M"
-			then	for _, m in pairs({"plugins", "disks", "config"})
+			then	for _, m in pairs({ "plugins", "disks", "config" })
 				do	a1, b1 = a1..(a.flags[m] and "1" or "2"), b1..(b.flags[m] and "1" or "2")
 				end
 			elseif	c_upper == "O"
@@ -141,7 +154,7 @@
 				a1, b1 = not a.flags[num], not b.flags[num]
 			elseif	c_upper == "A"
 			then	for _, n in pairs({1, 10, 11, 12, 5, 13, 2, 3, 4, 8, 7, 14, 6, 15, 16, 9, 17, 18, 0, "common"})
-				do	a1, b1 = a1..(a.flags[n] and "1" or "2"), b1..(b.flags[n] and "1" or "2")
+				do a1, b1 = a1..(a.flags[n] and "1" or "2"), b1..(b.flags[n] and "1" or "2")
 				end
 			elseif	c_upper == "D"
 			then	a1, b1 = a.description, b.description
