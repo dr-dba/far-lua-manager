@@ -1,5 +1,5 @@
 /*
-..
+...
 */
 
 local str_upper = utf8.Utf8_upper	or utf8.upper
@@ -13,10 +13,11 @@ local tbl_concat= table.concat
 local far_LIsUpper = far.LIsUpper
 
 /*
-..
+...
 */
 
-	local tbl_areas = {
+
+	local tbl_areas_upper = {
 		{ s = "S", l = " SHELL "	},
 		{ s = "I", l = " INFO "		},
 		{ s = "Q", l = " QVIEW "	},
@@ -40,11 +41,13 @@ local far_LIsUpper = far.LIsUpper
 	}
 
 	-- сворачивает список областей в короткую строку фиксированной длины
-	local function ShortArea(area)
+	local function ShortArea(area, in_upper)
 	--	local a  = ""
-		local au = " "..str_upper(area).." "
+	--	local au = " "..str_upper(area).." "
+		-- Should be already in upper case:
+		local au = " "..(in_upper and area or str_upper(area)).." "
 		local tbl_a = { }
-		for _, sl in ipairs(tbl_areas) 
+		for _, sl in ipairs(tbl_areas_upper) 
 		do--	a = a..(au:find(sl.l) and sl.s or "·") 
 			tbl_a[#tbl_a + 1] = str_find(au, sl.l) and sl.s or "·" 
 		end
@@ -52,7 +55,7 @@ local far_LIsUpper = far.LIsUpper
 		return tbl_concat(tbl_a)
 	end
 
-	local tbl_evt_groups = {
+	local tbl_evt_groups_upper = {
 		{ s = " DE", l = "DIALOGEVENT"},
 		{ s = " VE", l = "VIEWEREVENT"},
 		{ s = " EE", l = "EDITOREVENT"},
@@ -66,7 +69,7 @@ local far_LIsUpper = far.LIsUpper
 	--	local g = ""
 		local gu= " "..str_upper(group).." "
 		local tbl_g = { }
-		for _, sl in ipairs(tbl_evt_groups)
+		for _, sl in ipairs(tbl_evt_groups_upper)
 		do--	g = g..(gu:find(sl.l) and sl.s or " · ") 
 			tbl_g[#tbl_g + 1] = str_find(gu, sl.l) and sl.s or " · "
 		end
@@ -75,6 +78,7 @@ local far_LIsUpper = far.LIsUpper
 	end
 
 	local Area_Current_upper = str_upper(Area.Current)
+	local Area_Current_lower = str_lower(Area.Current)
 	--
 	-- сравнение 2 макросов по: "COMMON"?, текущая?, по областям, по клавишам, по маскам файлов, по описаниям
 	local function CompareMacros(a, b)
@@ -85,7 +89,7 @@ local far_LIsUpper = far.LIsUpper
 	--	local Area_Current_upper = str_upper(Area.Current)
 		for c in str_gmatch(S.SO.M, ".")
 		do	c_upper = str_upper(c)
-			a1, b1 = "", ""
+		--	a1, b1 = "", ""
 			if	c_upper == "O"
 			then	a1 = not str_cfind(a_area_upper, "COMMON")
 				b1 = not str_cfind(b_area_upper, "COMMON")
@@ -97,8 +101,8 @@ local far_LIsUpper = far.LIsUpper
 			--	a1 = not a.area:upper():cfind(Area.Current:upper())
 			--	b1 = not b.area:upper():cfind(Area.Current:upper())
 			elseif	c_upper == "A"
-			then	a1 = ShortArea(a.area)
-				b1 = ShortArea(b.area)
+			then	a1 = ShortArea(a_area_upper, true)
+				b1 = ShortArea(b_area_upper, true)
 			elseif	c_upper == "K"
 			then	a1 = str_upper(a.key)
 				b1 = str_upper(b.key)
@@ -108,6 +112,7 @@ local far_LIsUpper = far.LIsUpper
 			elseif	c_upper == "D"
 			then	a1 = a.description
 				b1 = b.description
+			else	a1, b1 = "", ""
 			end
 			--[[
 			if	far_LIsUpper(c)
@@ -116,9 +121,9 @@ local far_LIsUpper = far.LIsUpper
 			else	a1 = tostring(b1)
 				b1 = tostring(a1)
 			end --]]
-			a1 = tostring(a1)
-			b1 = tostring(b1)
-			a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+		--	a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+			a1 = a1 == nil and "" or tostring(a1)
+			b1 = b1 == nil and "" or tostring(b1)
 			f = "%-"..math_max(str_len(a1), str_len(b1)).."s"
 		--	as, bs = as..str_format(f, a1), bs..str_format(f, b1)
 			tbl_as[#tbl_as + 1] = str_format(f, a1)
@@ -135,7 +140,6 @@ local far_LIsUpper = far.LIsUpper
 		local tbl_as, tbl_bs = { }, { }
 		for c in str_gmatch(S.SO.E, ".")
 		do      c_upper = str_upper(c)
-			a1, b1 = "", ""
 			if	c_upper == "G"
 			then	a1 = ShortGroup(a.group)
 				b1 = ShortGroup(b.group)
@@ -143,15 +147,16 @@ local far_LIsUpper = far.LIsUpper
 			then	a1, b1 = a.filemask or "", b.filemask or ""
 			elseif	c_upper == "D"
 			then	a1, b1 = a.description, b.description
+			else	a1, b1 = "", ""
 			end
 			--[[
 			if	far_LIsUpper(c)
 			then	a1, b1 = tostring(a1), tostring(b1)
 			else    a1, b1 = tostring(b1), tostring(a1)
 			end --]]
-			a1 = tostring(a1)
-			b1 = tostring(b1)
-			a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+		--	a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+			a1 = a1 == nil and "" or tostring(a1)
+			b1 = b1 == nil and "" or tostring(b1)
 			f = "%-"..math_max(str_len(a1), str_len(b1)).."s"
 		--	as, bs = as..f:format(a1), bs..f:format(b1)
 			tbl_as[#tbl_as + 1] = str_format(f, a1)
@@ -160,31 +165,32 @@ local far_LIsUpper = far.LIsUpper
 		as = tbl_concat(tbl_as)
 		bs = tbl_concat(tbl_bs)
 		return as < bs
-	end
+	end -- CompareEvents
 	--
 	-- сравнение 2 модулей по: 1 - тип; 2 - маска поиска; 3 - имя
 	local function CompareModules(a, b)
 		local as, bs, a1, b1, f, c_upper = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in S.SO.O:gmatch(".")
+		for c in str_gmatch(S.SO.O, ".")
 		do	c_upper = str_upper(c)
-			a1, b1 = "", ""
+		--	a1, b1 = "", ""
 			if	c_upper == "T"
 			then	a1, b1 = a.type, b.type
 			elseif	c_upper == "M"
 			then	a1, b1 = a.mask, b.mask
 			elseif	c_upper == "N"
 			then    a1, b1 = a.name, b.name
+			else	a1, b1 = "", ""
 			end
 			--[[
 			if far.LIsUpper(c)
 			then	a1, b1 = tostring(a1), tostring(b1)
 			else	a1, b1 = tostring(b1), tostring(a1)
 			end --]]
-			a1 = tostring(a1)
-			b1 = tostring(b1)
-			a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
-			f = "%-"..math.max(a1:len(), b1:len()).."s"
+		--	a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+			a1 = a1 == nil and "" or tostring(a1)
+			b1 = b1 == nil and "" or tostring(b1)
+			f = "%-"..math_max(str_len(a1), str_len(b1)).."s"
 		--	as, bs = as..str_format(f, a1), bs..str_format(f, b1)
 			tbl_as[#tbl_as + 1] = str_format(f, a1)
 			tbl_bs[#tbl_bs + 1] = str_format(f, b1)
@@ -192,41 +198,57 @@ local far_LIsUpper = far.LIsUpper
 		as = tbl_concat(tbl_as)
 		bs = tbl_concat(tbl_bs)
 		return as < bs
-	end
+	end -- CompareModules
+
+	local tbl_menu_areas = { "plugins", "disks", "config" }
 	--
 	-- сравнение 2 пунктов меню плагинов по: использующие меню, область, "COMMON"?, текущая?, описание
 	local function CompareMenuItems(a, b)
-		local as, bs, a1, b1, f, c_upper = "", ""
+		local as, bs, a1, b1, f = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in S.SO.I:gmatch(".")
+		local tbl_a1, tbl_b1, c_upper, area_num
+		local a_flags, b_flags= a.flags, b.flags
+		for c in str_gmatch(S.SO.I, ".")
 		do	c_upper = str_upper(c)
-			a1, b1 = "", ""
+		--	a1, b1 = "", ""
 			if	c_upper == "M"
-			then	for _, m in pairs({"plugins", "disks", "config"})
-				do	a1, b1 = a1..(a.flags[m] and "1" or "2"), b1..(b.flags[m] and "1" or "2")
+			then	tbl_a1, tbl_b1 = { }, { }
+				for _, m in pairs(tbl_menu_areas)
+				do--	a1, b1 = a1..(a_flags[m] and "1" or "2"), b1..(b_flags[m] and "1" or "2")
+					tbl_a1[#tbl_a1 + 1] = a_flags[m] and "1" or "2"
+					tbl_b1[#tbl_b1 + 1] = b_flags[m] and "1" or "2"
 				end
+				a1 = tbl_concat(tbl_a1)
+				b1 = tbl_concat(tbl_b1)
 			elseif	c_upper == "O"
-			then	a1, b1 = not a.flags.common, not b.flags.common
+			then	a1, b1 = not a_flags.common, not b_flags.common
 			elseif	c_upper == "C"
-			then	local num
-				for n, v in pairs(Areas) do if Area.Current:lower() == v:lower() then num = n end end
-				a1, b1 = not a.flags[num], not b.flags[num]
+			then	area_num = nil
+			--	for n, v in pairs(Areas) do if Area.Current:lower() == v:lower() then num = n end end
+				for n, v in pairs(Areas_lower) do if Area_Current_lower == v then area_num = n; break end end
+				a1, b1 = not a_flags[area_num], not b_flags[area_num]
 			elseif	c_upper == "A"
-			then	for _, n in pairs({1, 10, 11, 12, 5, 13, 2, 3, 4, 8, 7, 14, 6, 15, 16, 9, 17, 18, 0, "common"})
-				do	a1, b1 = a1..(a.flags[n] and "1" or "2"), b1..(b.flags[n] and "1" or "2")
+			then	tbl_a1, tbl_b1 = { }, { }
+				for _, n in pairs(Areas_index)
+				do--	a1, b1 = a1..(a_flags[n] and "1" or "2"), b1..(b_flags[n] and "1" or "2")
+					tbl_a1[#tbl_a1 + 1] = a_flags[n] and "1" or "2"
+					tbl_b1[#tbl_b1 + 1] = b_flags[n] and "1" or "2"
 				end
+				a1 = tbl_concat(tbl_a1)
+				b1 = tbl_concat(tbl_b1)
 			elseif	c_upper == "D"
 			then	a1, b1 = a.description, b.description
+			else	a1, b1 = "", ""			
 			end
 			--[[
 			if far.LIsUpper(c)
 			then	a1, b1 = tostring(a1), tostring(b1)
 			else    a1, b1 = tostring(b1), tostring(a1)
 			end --]]
-			a1 = tostring(a1)
-			b1 = tostring(b1)
-			a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
-			f = "%-"..math.max(a1:len(), b1:len()).."s"
+		--	a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+			a1 = a1 == nil and "" or tostring(a1)
+			b1 = b1 == nil and "" or tostring(b1)
+			f = "%-"..math_max(str_len(a1), str_len(b1)).."s"
 		--	as, bs = as..str_format(f, a1), bs..str_format(f, b1)
 			tbl_as[#tbl_as + 1] = str_format(f, a1)
 			tbl_bs[#tbl_bs + 1] = str_format(f, b1)
@@ -234,29 +256,30 @@ local far_LIsUpper = far.LIsUpper
 		as = tbl_concat(tbl_as)
 		bs = tbl_concat(tbl_bs)
 		return as < bs
-	end
+	end -- CompareMenuItems
 	--
 	-- сравнение 2 префиксов командной строки по: 1 - префикс; 2 - описание
 	local function ComparePrefixes(a, b)
 		local as, bs, a1, b1, f, c_upper = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in S.SO.P:gmatch(".")
+		for c in str_gmatch(S.SO.P, ".")
 		do	c_upper = str_upper(c)
-			a1, b1 = "", ""
+		--	a1, b1 = "", ""
 			if	c_upper == "P"
 			then	a1, b1 = a.prefix, b.prefix
 			elseif	c_upper == "D"
 			then	a1, b1 = a.description, b.description
+			else	a1, b1 = "", ""
 			end
 			--[[
 			if far.LIsUpper(c)
 			then a1, b1 = tostring(a1), tostring(b1)
 			else a1, b1 = tostring(b1), tostring(a1)
 			end --]]
-			a1 = tostring(a1)
-			b1 = tostring(b1)
-			a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
-			f = "%-"..math.max(a1:len(), b1:len()).."s"
+		--	a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+			a1 = a1 == nil and "" or tostring(a1)
+			b1 = b1 == nil and "" or tostring(b1)
+			f = "%-"..math_max(str_len(a1), str_len(b1)).."s"
 		--	as, bs = as..str_format(f, a1), bs..str_format(f, b1)
 			tbl_as[#tbl_as + 1] = str_format(f, a1)
 			tbl_bs[#tbl_bs + 1] = str_format(f, b1)
@@ -264,31 +287,33 @@ local far_LIsUpper = far.LIsUpper
 		as = tbl_concat(tbl_as)
 		bs = tbl_concat(tbl_bs)
 		return as < bs
-	end
+	end -- ComparePrefixes
 	--
 	-- сравнение 2 панельных модулей по: 1 - описание
 	local function ComparePanels(a, b)
 		local as, bs, a1, b1, f, c_upper = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in S.SO.N:gmatch(".")
+		local a_info, b_info = a.Info, b.Info
+		for c in str_gmatch(S.SO.N, ".")
 		do	c_upper = str_upper(c)
-			a1, b1 = "", ""
+		--	a1, b1 = "", ""
 			if	c_upper == "D"
-			then	a1, b1 = a.Info.Description, b.Info.Description
+			then	a1, b1 = a_info.Description,	b_info.Description
 			elseif	c_upper == "T"
-			then	a1, b1 = a.Info.Title, b.Info.Title
+			then	a1, b1 = a_info.Title,		b_info.Title
 			elseif	c_upper == "A"
-			then	a1, b1 = a.Info.Author, b.Info.Author
+			then	a1, b1 = a_info.Author,		b_info.Author
+			else	a1, b1 = "", ""
 			end
 			--[[
 			if far.LIsUpper(c)
 			then	a1, b1 = tostring(a1), tostring(b1)
 			else	a1, b1 = tostring(b1), tostring(a1)
 			end--]]
-			a1 = tostring(a1)
-			b1 = tostring(b1)
-			a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
-			f = "%-"..math_max(a1:len(), b1:len()).."s"
+		--	a1, b1 = a1 == "nil" and "" or a1, b1 == "nil" and "" or b1
+			a1 = a1 == nil and "" or tostring(a1)
+			b1 = b1 == nil and "" or tostring(b1)
+			f = "%-"..math_max(str_len(a1), str_len(b1)).."s"
 		--	as, bs = as..str_format(f, a1), bs..str_format(f, b1)
 			tbl_as[#tbl_as + 1] = str_format(f, a1)
 			tbl_bs[#tbl_bs + 1] = str_format(f, b1)
@@ -297,7 +322,6 @@ local far_LIsUpper = far.LIsUpper
 		bs = tbl_concat(tbl_bs)
 		return as < bs
 	end -- ComparePanels
-
 /*
 ..
 */
