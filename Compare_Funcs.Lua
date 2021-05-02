@@ -14,6 +14,63 @@ local far_LIsUpper = far.LIsUpper
 /*
 ..
 */
+	local tbl_areas = {
+		{ s = "S", l = " SHELL "	},
+		{ s = "I", l = " INFO "		},
+		{ s = "Q", l = " QVIEW "	},
+		{ s = "T", l = " TREE "		},
+		{ s = "s", l = " SEARCH "	},
+		{ s = "F", l = " FINDFOLDER "	},
+		{ s = "V", l = " VIEWER "	},
+		{ s = "E", l = " EDITOR "	},
+		{ s = "D", l = " DIALOG "	},
+		{ s = "m", l = " MENU "		},
+		{ s = "M", l = " MAINMENU "	},
+		{ s = "U", l = " USERMENU "	},
+		{ s = "d", l = " DISKS "	},
+		{ s = "A", l = " SHELLAUTOCOMPLETION "	},
+		{ s = "a", l = " DIALOGAUTOCOMPLETION "	},
+		{ s = "H", l = " HELP "		},
+		{ s = "G", l = " GRABBER "	},
+		{ s = "e", l = " DESKTOP "	},
+		{ s = "O", l = " OTHER "	},
+		{ s = "C", l = " COMMON "	}
+	}
+
+	-- сворачивает список областей в короткую строку фиксированной длины
+	local function ShortArea(area)
+	--	local a  = ""
+		local au = " "..str_upper(area).." "
+		local tbl_a = { }
+		for _, sl in ipairs(tbl_areas) 
+		do--	a = a..(au:find(sl.l) and sl.s or "·") 
+			tbl_a[#tbl_a + 1] = str_find(au, sl.l) and sl.s or "·" 
+		end
+	--	return a
+		return tbl_concat(tbl_a)
+	end
+
+	local tbl_evt_groups = {
+		{ s = " DE", l = "DIALOGEVENT"	},
+		{ s = " VE", l = "VIEWEREVENT"	},
+		{ s = " EE", l = "EDITOREVENT"	},
+		{ s = " EI", l = "EDITORINPUT"	},
+		{ s = " CI", l = "CONSOLEINPUT"	},
+		{ s = " EF", l = "EXITFAR"	},
+	}
+	--
+	-- сворачивает список областей в короткую строку фиксированной длины
+	local function ShortGroup(group)
+	--	local g = ""
+		local gu= " "..str_upper(group).." "
+		local tbl_g = { }
+		for _, sl in ipairs(tbl_evt_groups)
+		do--	g = g..(gu:find(sl.l) and sl.s or " · ") 
+			tbl_g[#tbl_g + 1] = str_find(gu, sl.l) and sl.s or " · "
+		end
+	--	return g
+		return tbl_concat(tbl_a)
+	end
 
 	local Area_Current_upper = str_upper(Area.Current)
 	--
