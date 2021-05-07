@@ -1,6 +1,6 @@
-/*
+--[[
 ...
-*/
+]]
 
 local str_upper = utf8.Utf8_upper	or utf8.upper
 local str_gmatch= utf8.Utf8_gmatch	or utf8.gmatch
@@ -12,11 +12,9 @@ local math_max	= math.max
 local tbl_concat= table.concat
 local far_LIsUpper = far.LIsUpper
 
-/*
+--[[
 ...
-*/
-
-
+]]
 	local tbl_areas_upper = {
 		{ s = "S", l = " SHELL "	},
 		{ s = "I", l = " INFO "		},
@@ -82,13 +80,15 @@ local far_LIsUpper = far.LIsUpper
 	--
 	-- сравнение 2 макросов по: "COMMON"?, текущая?, по областям, по клавишам, по маскам файлов, по описаниям
 	local function CompareMacros(a, b)
-		local as, bs, a1, b1, f, c_upper = "", ""
+		local as, bs, a1, b1, f --[[, c_upper]] = "", ""
 		local tbl_as, tbl_bs = { }, { }
 		local a_area_upper = str_upper(a.area)
 		local b_area_upper = str_upper(b.area)
 	--	local Area_Current_upper = str_upper(Area.Current)
-		for c in str_gmatch(S.SO.M, ".")
-		do	c_upper = str_upper(c)
+	--	for c in str_gmatch(S.SO.M, ".")
+		for c_upper in str_gmatch(str_upper(S.SO.M), ".")
+		do
+		--	local c_upper = str_upper(c)
 		--	a1, b1 = "", ""
 			if	c_upper == "O"
 			then	a1 = not str_cfind(a_area_upper, "COMMON")
@@ -136,10 +136,10 @@ local far_LIsUpper = far.LIsUpper
 	--
 	-- сравнение 2 обработчиков событий по: 1 - по группам; 2 - по маскам файлов; 3 - по описаниям
 	local function CompareEvents(a, b)
-		local as, bs, a1, b1, f, c_upper = "", ""
+		local as, bs, a1, b1, f --[[, c_upper]] = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in str_gmatch(S.SO.E, ".")
-		do      c_upper = str_upper(c)
+		for c_upper in str_gmatch(str_upper(S.SO.E), ".")
+		do--	local c_upper = str_upper(c)
 			if	c_upper == "G"
 			then	a1 = ShortGroup(a.group)
 				b1 = ShortGroup(b.group)
@@ -169,10 +169,12 @@ local far_LIsUpper = far.LIsUpper
 	--
 	-- сравнение 2 модулей по: 1 - тип; 2 - маска поиска; 3 - имя
 	local function CompareModules(a, b)
-		local as, bs, a1, b1, f, c_upper = "", ""
+		local as, bs, a1, b1, f--[[, c_upper]] = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in str_gmatch(S.SO.O, ".")
-		do	c_upper = str_upper(c)
+	--	for c in str_gmatch(S.SO.O, ".")
+		for c_upper in str_gmatch(str_upper(S.SO.O), ".")
+		do
+		--	local c_upper = str_upper(c)
 		--	a1, b1 = "", ""
 			if	c_upper == "T"
 			then	a1, b1 = a.type, b.type
@@ -201,15 +203,18 @@ local far_LIsUpper = far.LIsUpper
 	end -- CompareModules
 
 	local tbl_menu_areas = { "plugins", "disks", "config" }
+
 	--
 	-- сравнение 2 пунктов меню плагинов по: использующие меню, область, "COMMON"?, текущая?, описание
 	local function CompareMenuItems(a, b)
 		local as, bs, a1, b1, f = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		local tbl_a1, tbl_b1, c_upper, area_num
-		local a_flags, b_flags= a.flags, b.flags
-		for c in str_gmatch(S.SO.I, ".")
-		do	c_upper = str_upper(c)
+		local tbl_a1, tbl_b1, area_num --[[, c_upper]]
+		local a_flags, b_flags = a.flags, b.flags
+	--	for c in str_gmatch(S.SO.I, ".")
+		for c_upper in str_gmatch(str_upper(S.SO.I), ".")
+		do
+		--	c_upper = str_upper(c)
 		--	a1, b1 = "", ""
 			if	c_upper == "M"
 			then	tbl_a1, tbl_b1 = { }, { }
@@ -260,10 +265,12 @@ local far_LIsUpper = far.LIsUpper
 	--
 	-- сравнение 2 префиксов командной строки по: 1 - префикс; 2 - описание
 	local function ComparePrefixes(a, b)
-		local as, bs, a1, b1, f, c_upper = "", ""
+		local as, bs, a1, b1, f --[[, c_upper]] = "", ""
 		local tbl_as, tbl_bs = { }, { }
-		for c in str_gmatch(S.SO.P, ".")
-		do	c_upper = str_upper(c)
+	--	for c in str_gmatch(S.SO.P, ".")
+		for c_upper in str_gmatch(str_upper(S.SO.P), ".")
+		do
+		--	c_upper = str_upper(c)
 		--	a1, b1 = "", ""
 			if	c_upper == "P"
 			then	a1, b1 = a.prefix, b.prefix
@@ -291,11 +298,13 @@ local far_LIsUpper = far.LIsUpper
 	--
 	-- сравнение 2 панельных модулей по: 1 - описание
 	local function ComparePanels(a, b)
-		local as, bs, a1, b1, f, c_upper = "", ""
+		local as, bs, a1, b1, f --[[, c_upper]] = "", ""
 		local tbl_as, tbl_bs = { }, { }
 		local a_info, b_info = a.Info, b.Info
-		for c in str_gmatch(S.SO.N, ".")
-		do	c_upper = str_upper(c)
+	--	for c in str_gmatch(S.SO.N, ".")
+		for c in str_gmatch(str_upper(S.SO.N), ".")
+		do
+		--	local c_upper = str_upper(c)
 		--	a1, b1 = "", ""
 			if	c_upper == "D"
 			then	a1, b1 = a_info.Description,	b_info.Description
@@ -322,9 +331,10 @@ local far_LIsUpper = far.LIsUpper
 		bs = tbl_concat(tbl_bs)
 		return as < bs
 	end -- ComparePanels
-/*
+
+--[[
 ..
-*/
+]]
 		-- [[ теперь таблица индексирована числами
 		-- отсортируем всё
 		Area_Current_upper = str_upper(Area.Current)
@@ -335,3 +345,6 @@ local far_LIsUpper = far.LIsUpper
 		table.sort(menuitems,	CompareMenuItems)
 		table.sort(prefixes,	ComparePrefixes)
 		table.sort(panels,	ComparePanels) --]]
+--[[
+...
+]]
